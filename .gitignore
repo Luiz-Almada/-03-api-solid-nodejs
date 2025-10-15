@@ -3,3 +3,6 @@ build
 dist
 .env
 /src/generated/prisma
+coverage
+.vscode
+.DS_Store
