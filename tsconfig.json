@@ -47,5 +47,6 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
     "noEmit": true  // Required when using allowImportingTsExtensions
-  }
+  },
+  "include": ["src"]
 }
