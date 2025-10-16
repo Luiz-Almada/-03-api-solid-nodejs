@@ -1,17 +1,22 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
 import { AuthenticateUseCase } from './authenticate'
 import { hash } from 'bcryptjs'
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
 
+let userRepository: InMemoryUsersRepository
+let sut: AuthenticateUseCase
+
 describe('Authenticate Use Case', () => {
-  it('should be able to authenticate', async () => {
-    const userRepository = new InMemoryUsersRepository()
+  beforeEach(() => {
+    userRepository = new InMemoryUsersRepository()
 
     // A sigla SUT em testes de software significa System Under Test (Sistema Sob Teste).
-    const sut = new AuthenticateUseCase(userRepository)
+    sut = new AuthenticateUseCase(userRepository)
+  })
 
+  it('should be able to authenticate', async () => {
     await userRepository.create({
       name: 'John Doe',
       email: 'johndoe@example.com',
@@ -27,9 +32,6 @@ describe('Authenticate Use Case', () => {
   })
 
   it('should not be able to authenticate with wrong email', async () => {
-    const userRepository = new InMemoryUsersRepository()
-    const sut = new AuthenticateUseCase(userRepository)
-
     expect(() =>
       sut.execute({
         email: 'johndoe@example.com',
@@ -39,9 +41,6 @@ describe('Authenticate Use Case', () => {
   })
 
   it('should not be able to authenticate with wrong password', async () => {
-    const userRepository = new InMemoryUsersRepository()
-    const sut = new AuthenticateUseCase(userRepository)
-
     await userRepository.create({
       name: 'John Doe',
       email: 'johndoe2@example.com',
