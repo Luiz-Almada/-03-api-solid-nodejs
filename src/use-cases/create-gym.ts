@@ -1,6 +1,3 @@
-import { hash } from 'bcryptjs'
-
-import { UserAlreadyExistsError } from './errors/user-already-exists-error'
 import type { GymsRepository } from '@/repositories/gyms-repository'
 import type { Gym } from '@prisma/client'
 
@@ -15,10 +12,6 @@ interface CreateGymUseCaseRequest {
 interface CreateGymUseCaseResponse {
   gym: Gym
 } 
-
-//SOLID
-
-// D - Dependency Inversion Principle
 
 export class CreateGymUseCase {
   constructor(private gymsRepository: GymsRepository) {}
