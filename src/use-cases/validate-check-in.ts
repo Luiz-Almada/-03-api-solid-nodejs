@@ -1,66 +1,43 @@
-import { InvalidCredentialsError } from './errors/invalid-credentials-error';
-import { compare } from 'bcryptjs';
 import type { CheckIn } from '@prisma/client';
 import type { CheckInsRepository } from '@/repositories/check-ins-repository';
-import type { GymsRepository } from '@/repositories/gyms-repository';
 import { ResourceNotFoundError } from './errors/resource-not-found-error';
-import { getDistanceBetweenCoordinates } from '@/utils/get-distance-between-coordinates';
-import { MaxNumberOfCheckInsError } from './errors/max-number-of-check-ins-error';
-import { MaxDistanceError } from './errors/max-deistance-error';
+import dayjs from 'dayjs';
+import { LateCheckInValidationError } from './errors/late-check-in-validation-error';
 
-interface CheckInUseCaseRequest {
-  userId: string;
-  gymId: string;
-  userLatitude: number;
-  userLongitude: number;
+interface ValidateCheckInUseCaseRequest {
+  checkInId: string;
 }
 
-interface CheckInUseCaseResponse {
+interface ValidateCheckInUseCaseResponse {
   checkIn: CheckIn;
 }
 
-export class CheckInUseCase {
+export class ValidateCheckInUseCase {
   constructor(
     private checkInsRepository: CheckInsRepository,
-    private gymRepository: GymsRepository,
   ) {}
     
   async execute({ 
-    userId,
-    gymId,
-    userLatitude,
-    userLongitude,
-  }: CheckInUseCaseRequest): Promise<CheckInUseCaseResponse> {
-    const gym = await this.gymRepository.findById(gymId);
+    checkInId,
+  }: ValidateCheckInUseCaseRequest): Promise<ValidateCheckInUseCaseResponse> {
+    const checkIn = await this.checkInsRepository.findById(checkInId);
 
-    if (!gym) {
+    if (!checkIn) {
       throw new ResourceNotFoundError();
     }
 
-    const distance = getDistanceBetweenCoordinates(
-      { latitude: userLatitude, longitude: userLongitude },
-      { latitude: gym.latitude.toNumber(), longitude: gym.longitude.toNumber() },
+    const distanceInMinutesFromCheckInCreation = dayjs(new Date()).diff(
+      checkIn.created_at,
+      'minutes',
     );
 
-    const MAX_DISTANCE_IN_KILOMETERS = 0.1; // 100 metros
-    
-    if (distance > MAX_DISTANCE_IN_KILOMETERS) {
-      throw new MaxDistanceError()
+    if (distanceInMinutesFromCheckInCreation > 20) {
+      throw new LateCheckInValidationError();
     }
 
-    const checkInOnSameDate = await this.checkInsRepository.findByUserIdOnDate(
-      userId,
-      new Date(),
-    )
+    checkIn.validated_at = new Date();
 
-    if (checkInOnSameDate) {
-      throw new MaxNumberOfCheckInsError()
-    }
-
-    const checkIn = await this.checkInsRepository.create({
-      user_id: userId,
-      gym_id: gymId,
-    });
+    await this.checkInsRepository.save(checkIn);
 
     return {
       checkIn
