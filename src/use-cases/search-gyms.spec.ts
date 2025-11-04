@@ -1,7 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { InMemoryGymsRepository } from '@/repositories/in-memory/in-memory-gyms-repository'
-import { Decimal } from '@prisma/client/runtime/library'
-import { MaxDistanceError } from './errors/max-deistance-error'
 import { SearchGymsUseCase } from './search-gyms'
 
 let gymsRepository: InMemoryGymsRepository
