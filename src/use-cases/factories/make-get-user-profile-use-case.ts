@@ -1,11 +1,11 @@
 // Factory Pattern
-import { RegisterUseCase } from '../register'
 import { PrismaUsersRepository } from '@/repositories/prisma/prisma-user-repository'
+import { GetUserProfileUseCase } from '../get-user-profile'
 
-export function makeRegisterUseCase() {
+export function makeGetUserProfileUseCase() {
   const usersRepository = new PrismaUsersRepository()
 
-  const useCase = new RegisterUseCase(usersRepository)
+  const useCase = new GetUserProfileUseCase(usersRepository)
 
   return useCase
 }
