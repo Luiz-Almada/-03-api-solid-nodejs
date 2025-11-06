@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/Luiz-Almada/-03-api-solid-nodejs#readme",
   "dependencies": {
+    "@fastify/jwt": "10.0.0",
     "@prisma/client": "6.17.0",
     "@types/bcryptjs": "2.4.6",
     "bcryptjs": "3.0.2",
